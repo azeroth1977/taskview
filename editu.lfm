@@ -1,28 +1,28 @@
 object editform: Teditform
-  Left = 604
-  Height = 631
-  Top = 247
-  Width = 961
+  Left = 602
+  Height = 567
+  Top = 185
+  Width = 1008
   Caption = 'Редакция'
-  ClientHeight = 631
-  ClientWidth = 961
+  ClientHeight = 567
+  ClientWidth = 1008
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '2.0.10.0'
   object pc: TPageControl
     Left = 0
-    Height = 590
+    Height = 526
     Top = 0
-    Width = 961
-    ActivePage = ts_act
+    Width = 1008
+    ActivePage = ts_prm
     Align = alClient
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChanging = pcChanging
     object ts_prm: TTabSheet
       Caption = 'Общие'
-      ClientHeight = 562
-      ClientWidth = 953
+      ClientHeight = 498
+      ClientWidth = 1000
       object m_description: TMemo
         Left = 93
         Height = 112
@@ -59,7 +59,7 @@ object editform: Teditform
         MinDate = -53780
         TabOrder = 2
         TrailingSeparator = False
-        TextForNullDate = 'NULL'
+        TextForNullDate = 'не задано'
         LeadingZeros = True
         Kind = dtkDateTime
         TimeFormat = tf24
@@ -154,12 +154,12 @@ object editform: Teditform
     end
     object ts_trig: TTabSheet
       Caption = 'Триггеры'
-      ClientHeight = 562
-      ClientWidth = 953
+      ClientHeight = 498
+      ClientWidth = 1000
       OnShow = ts_trigShow
       object tbtrig: TToolBar
         Left = 0
-        Height = 562
+        Height = 498
         Top = 0
         Width = 66
         Align = alLeft
@@ -186,63 +186,32 @@ object editform: Teditform
           OnClick = tb_trigdelClick
         end
       end
-      object Panel1: TPanel
-        Left = 66
-        Height = 562
+      object trig_pan: TPanel
+        Left = 375
+        Height = 498
         Top = 0
-        Width = 887
+        Width = 625
         Align = alClient
-        BevelOuter = bvNone
-        ClientHeight = 562
-        ClientWidth = 887
-        TabOrder = 1
-        object cb_trig_type: TComboBox
-          Left = 552
-          Height = 23
-          Top = 8
-          Width = 300
-          AutoSize = False
-          ItemHeight = 15
-          Style = csDropDownList
-          TabOrder = 0
-        end
-        object lb_trig: TListBox
-          Left = 0
-          Height = 562
-          Top = 0
-          Width = 309
-          Align = alLeft
-          ItemHeight = 0
-          OnClick = lb_trigClick
-          TabOrder = 1
-        end
-        object Memo1: TMemo
-          Left = 336
-          Height = 88
-          Top = 376
-          Width = 541
-          Lines.Strings = (
-            'Memo1'
-          )
-          TabOrder = 2
-        end
-        object cb_trig_enable: TCheckBox
-          Left = 320
-          Height = 19
-          Top = 40
-          Width = 77
-          Caption = 'Включено'
-          TabOrder = 3
-        end
+        ChildSizing.LeftRightSpacing = 5
+        ChildSizing.TopBottomSpacing = 5
+        ChildSizing.HorizontalSpacing = 5
+        ChildSizing.VerticalSpacing = 10
+        ChildSizing.ControlsPerLine = 2
+        ClientHeight = 498
+        ClientWidth = 625
+        TabOrder = 2
+        OnClick = trig_panClick
         object lab_tr_id: TLabel
-          Left = 320
-          Height = 17
-          Top = 8
-          Width = 53
+          Left = 6
+          Height = 21
+          Top = 6
+          Width = 613
+          Align = alTop
+          Alignment = taCenter
           Caption = 'lab_tr_id'
           Font.CharSet = RUSSIAN_CHARSET
           Font.Color = clBlack
-          Font.Height = -13
+          Font.Height = -16
           Font.Name = 'Segoe UI'
           Font.Pitch = fpVariable
           Font.Quality = fqDraft
@@ -250,152 +219,215 @@ object editform: Teditform
           ParentColor = False
           ParentFont = False
         end
-        object dtp_start: TDateTimePicker
-          Left = 480
-          Height = 23
-          Top = 88
-          Width = 133
-          CenturyFrom = 1941
-          MaxDate = 2958465
-          MinDate = 275
-          TabOrder = 4
-          TrailingSeparator = False
-          TextForNullDate = 'не задано'
-          LeadingZeros = True
-          Kind = dtkDateTime
-          TimeFormat = tf24
-          TimeDisplay = tdHMS
-          DateMode = dmComboBox
-          Date = 275
-          UseDefaultSeparators = True
-          HideDateTimeParts = []
-          MonthNames = 'Long'
-        end
-        object sdt_lab: TLabel
-          Left = 320
-          Height = 15
-          Top = 96
-          Width = 112
-          Caption = 'Начало исполнения'
-          ParentColor = False
-        end
-        object sdt_lab1: TLabel
-          Left = 320
-          Height = 15
-          Top = 128
-          Width = 132
-          Caption = 'Окончание исполнения'
-          ParentColor = False
-        end
-        object dtp_stop: TDateTimePicker
-          Left = 480
-          Height = 23
-          Top = 120
-          Width = 133
-          CenturyFrom = 1941
-          MaxDate = 2958465
-          MinDate = 275
-          TabOrder = 5
-          TrailingSeparator = False
-          TextForNullDate = 'не задано'
-          LeadingZeros = True
-          Kind = dtkDateTime
-          TimeFormat = tf24
-          TimeDisplay = tdHMS
-          DateMode = dmComboBox
-          Date = 275
-          UseDefaultSeparators = True
-          HideDateTimeParts = []
-          MonthNames = 'Long'
-        end
-        object dtp_limit: TDateTimePicker
-          Left = 482
-          Height = 23
-          Top = 152
-          Width = 133
-          CenturyFrom = 1941
-          MaxDate = 2958465
-          MinDate = 275
-          TabOrder = 6
-          TrailingSeparator = False
-          TextForNullDate = 'не задано'
-          LeadingZeros = True
-          Kind = dtkDateTime
-          TimeFormat = tf24
-          TimeDisplay = tdHMS
-          DateMode = dmComboBox
-          Date = 275
-          Time = 0.565918692132982
-          UseDefaultSeparators = True
-          HideDateTimeParts = []
-          MonthNames = 'Long'
-        end
-        object sdt_lab2: TLabel
-          Left = 322
-          Height = 15
-          Top = 160
-          Width = 87
-          Caption = 'Лимит времени'
-          ParentColor = False
+        object cb_trig_enable: TCheckBox
+          Left = 6
+          Height = 19
+          Top = 37
+          Width = 613
+          Align = alTop
+          Caption = 'Включено'
+          TabOrder = 0
         end
         object gb_repetition: TGroupBox
-          Left = 325
-          Height = 150
-          Top = 186
-          Width = 548
+          Left = 6
+          Height = 155
+          Top = 264
+          Width = 613
+          Align = alBottom
           Caption = 'Повторы'
-          ClientHeight = 130
-          ClientWidth = 544
-          TabOrder = 7
+          ClientHeight = 135
+          ClientWidth = 609
+          TabOrder = 1
+          object ed_dur: TEdit
+            Left = 144
+            Height = 23
+            Top = 24
+            Width = 264
+            TabOrder = 0
+          end
           object Label8: TLabel
             Left = 32
             Height = 15
             Top = 24
             Width = 77
             Caption = 'Длительность'
+            FocusControl = ed_dur
             ParentColor = False
           end
-          object ed_dur: TEdit
-            Left = 160
-            Height = 23
-            Top = 16
-            Width = 264
-            TabOrder = 0
-          end
           object Label9: TLabel
-            Left = 56
+            Left = 32
             Height = 15
-            Top = 63
+            Top = 56
             Width = 53
             Caption = 'Интервал'
+            FocusControl = ed_interval
             ParentColor = False
           end
           object ed_interval: TEdit
-            Left = 161
+            Left = 144
             Height = 23
-            Top = 55
+            Top = 56
             Width = 263
             TabOrder = 1
           end
           object cb_stopatdurationend: TCheckBox
-            Left = 56
+            Left = 32
             Height = 19
-            Top = 88
+            Top = 0
             Width = 273
             Caption = 'Останавливать задачу по истечению времени'
             TabOrder = 2
           end
+          object b_trig_specific: TButton
+            Left = 0
+            Height = 31
+            Top = 104
+            Width = 609
+            Align = alBottom
+            Caption = 'Специфичиские параметры'
+            TabOrder = 3
+          end
         end
+        object Memo1: TMemo
+          Left = 6
+          Height = 63
+          Top = 429
+          Width = 613
+          Align = alBottom
+          Lines.Strings = (
+            'Memo1'
+          )
+          TabOrder = 2
+        end
+        object Panel1: TPanel
+          Left = 6
+          Height = 188
+          Top = 66
+          Width = 613
+          Align = alClient
+          ChildSizing.LeftRightSpacing = 5
+          ChildSizing.TopBottomSpacing = 5
+          ChildSizing.HorizontalSpacing = 10
+          ChildSizing.VerticalSpacing = 5
+          ChildSizing.Layout = cclLeftToRightThenTopToBottom
+          ChildSizing.ControlsPerLine = 2
+          ClientHeight = 188
+          ClientWidth = 613
+          TabOrder = 3
+          object lab_trig_start: TLabel
+            Left = 5
+            Height = 23
+            Top = 5
+            Width = 132
+            Caption = 'Начало исполнения'
+            FocusControl = dtp_start
+            ParentColor = False
+          end
+          object dtp_start: TDateTimePicker
+            Left = 147
+            Height = 23
+            Top = 5
+            Width = 133
+            CenturyFrom = 1941
+            MaxDate = 2958465
+            MinDate = 275
+            TabOrder = 0
+            TrailingSeparator = False
+            TextForNullDate = 'не задано'
+            LeadingZeros = True
+            Kind = dtkDateTime
+            TimeFormat = tf24
+            TimeDisplay = tdHMS
+            DateMode = dmComboBox
+            Date = 275
+            Time = 0.626741099535138
+            UseDefaultSeparators = True
+            HideDateTimeParts = []
+            MonthNames = 'Long'
+          end
+          object lab_trig_end: TLabel
+            Left = 5
+            Height = 23
+            Top = 33
+            Width = 132
+            Caption = 'Окончание исполнения'
+            FocusControl = dtp_stop
+            ParentColor = False
+          end
+          object dtp_stop: TDateTimePicker
+            Left = 147
+            Height = 23
+            Top = 33
+            Width = 133
+            CenturyFrom = 1941
+            MaxDate = 2958465
+            MinDate = 275
+            TabOrder = 1
+            TrailingSeparator = False
+            TextForNullDate = 'не задано'
+            LeadingZeros = True
+            Kind = dtkDateTime
+            TimeFormat = tf24
+            TimeDisplay = tdHMS
+            DateMode = dmComboBox
+            Date = 275
+            Time = 0.626741099535138
+            UseDefaultSeparators = True
+            HideDateTimeParts = []
+            MonthNames = 'Long'
+          end
+          object lab_trig_lim: TLabel
+            Left = 5
+            Height = 23
+            Top = 61
+            Width = 132
+            Caption = 'Лимит времени'
+            FocusControl = dtp_limit
+            ParentColor = False
+          end
+          object dtp_limit: TDateTimePicker
+            Left = 147
+            Height = 23
+            Top = 61
+            Width = 133
+            CenturyFrom = 1941
+            MaxDate = 2958465
+            MinDate = 275
+            TabOrder = 2
+            TrailingSeparator = False
+            TextForNullDate = 'не задано'
+            LeadingZeros = True
+            Kind = dtkDateTime
+            TimeFormat = tf24
+            TimeDisplay = tdHMS
+            DateMode = dmComboBox
+            Date = 275
+            Time = 0.565918692132982
+            UseDefaultSeparators = True
+            HideDateTimeParts = []
+            MonthNames = 'Long'
+          end
+        end
+      end
+      object lb_trig: TListBox
+        Left = 66
+        Height = 498
+        Top = 0
+        Width = 309
+        Align = alLeft
+        ItemHeight = 0
+        OnClick = lb_trigClick
+        TabOrder = 1
       end
     end
     object ts_act: TTabSheet
       Caption = 'Действия'
-      ClientHeight = 562
-      ClientWidth = 953
+      ClientHeight = 498
+      ClientWidth = 1000
       OnShow = ts_actShow
       object lb_actions: TListBox
         Left = 66
-        Height = 562
+        Height = 498
         Top = 0
         Width = 309
         Align = alLeft
@@ -403,9 +435,9 @@ object editform: Teditform
         OnClick = lb_trigClick
         TabOrder = 0
       end
-      object tbtrig1: TToolBar
+      object tb_act: TToolBar
         Left = 0
-        Height = 562
+        Height = 498
         Top = 0
         Width = 66
         Align = alLeft
@@ -434,19 +466,19 @@ object editform: Teditform
       end
       object actpanel: TPanel
         Left = 375
-        Height = 562
+        Height = 498
         Top = 0
-        Width = 578
+        Width = 625
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 562
-        ClientWidth = 578
+        ClientHeight = 498
+        ClientWidth = 625
         TabOrder = 2
         object lab_act_id: TLabel
           Left = 0
           Height = 21
           Top = 0
-          Width = 578
+          Width = 625
           Align = alTop
           Alignment = taCenter
           Caption = 'lab_act_id'
@@ -455,14 +487,14 @@ object editform: Teditform
           ParentColor = False
           ParentFont = False
         end
-        object PageControl1: TPageControl
+        object pc_act: TPageControl
           Left = 0
-          Height = 541
+          Height = 477
           Top = 21
-          Width = 578
-          ActivePage = ts_act_email
+          Width = 625
+          ActivePage = ts_act_showmessage
           Align = alClient
-          TabIndex = 1
+          TabIndex = 3
           TabOrder = 0
           object ts_act_exec: TTabSheet
             Caption = 'ts_act_exec'
@@ -594,11 +626,38 @@ object editform: Teditform
             end
             object mem_act_email_body: TMemo
               Left = 5
-              Height = 304
+              Height = 211
               Top = 204
               Width = 560
               Align = alClient
               TabOrder = 3
+            end
+            object ed_act_email_serv: TEdit
+              Left = 5
+              Height = 23
+              Top = 485
+              Width = 560
+              Align = alBottom
+              TabOrder = 4
+            end
+            object lab_act_email_serv: TLabel
+              Left = 5
+              Height = 15
+              Top = 460
+              Width = 560
+              Align = alBottom
+              Caption = 'Сервер smtp'
+              ParentColor = False
+            end
+            object b_act_email_attachments: TButton
+              Left = 5
+              Height = 25
+              Top = 425
+              Width = 560
+              Align = alBottom
+              Caption = 'Приложения'
+              OnClick = b_act_email_attachmentsClick
+              TabOrder = 5
             end
           end
           object ts_act_com: TTabSheet
@@ -650,35 +709,35 @@ object editform: Teditform
               ParentColor = False
             end
           end
-          object TabSheet1: TTabSheet
+          object ts_act_showmessage: TTabSheet
             Caption = 'ts_act_showmessage'
             ChildSizing.LeftRightSpacing = 5
             ChildSizing.TopBottomSpacing = 5
             ChildSizing.VerticalSpacing = 10
-            ClientHeight = 513
-            ClientWidth = 570
+            ClientHeight = 449
+            ClientWidth = 617
             object lab_act_sm_title: TLabel
               Left = 5
               Height = 15
               Top = 5
-              Width = 560
+              Width = 607
               Align = alTop
               Caption = 'Заголовок'
               ParentColor = False
             end
-            object ed_act_exec_path1: TEdit
+            object ed_act_sm_title: TEdit
               Left = 5
               Height = 23
               Top = 30
-              Width = 560
+              Width = 607
               Align = alTop
               TabOrder = 0
             end
             object mem_act_sm_mes: TMemo
               Left = 5
-              Height = 420
+              Height = 356
               Top = 88
-              Width = 560
+              Width = 607
               Align = alClient
               TabOrder = 1
             end
@@ -686,7 +745,7 @@ object editform: Teditform
               Left = 5
               Height = 15
               Top = 63
-              Width = 560
+              Width = 607
               Align = alTop
               Caption = 'Сообщение'
               ParentColor = False
@@ -1208,14 +1267,14 @@ object editform: Teditform
   object bpan: TPanel
     Left = 0
     Height = 41
-    Top = 590
-    Width = 961
+    Top = 526
+    Width = 1008
     Align = alBottom
     ClientHeight = 41
-    ClientWidth = 961
+    ClientWidth = 1008
     TabOrder = 1
     object BitBtn1: TBitBtn
-      Left = 817
+      Left = 864
       Height = 39
       Top = 1
       Width = 143
@@ -1227,7 +1286,7 @@ object editform: Teditform
       TabOrder = 0
     end
     object BitBtn2: TBitBtn
-      Left = 673
+      Left = 720
       Height = 39
       Top = 1
       Width = 144

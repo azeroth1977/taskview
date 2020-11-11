@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms,mainu, datetimectrls, TaskScheduler_1_0_TLB, selectlistU;
+  Forms,mainu, datetimectrls, TaskScheduler_1_0_TLB, selectlistU, handle_proc;
 
 {$R *.res}
 

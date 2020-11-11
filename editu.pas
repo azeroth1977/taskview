@@ -9,7 +9,7 @@ uses
    Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
    StdCtrls, Buttons, EditBtn, DateTimePicker, SynEdit,
    SynPluginSyncroEdit, SynHighlighterXML
-   ,TaskScheduler_1_0_TLB, UITypes;
+   ,TaskScheduler_1_0_TLB, UITypes, Types;
 
 type
 
@@ -19,15 +19,17 @@ type
   Teditform = class(TForm)
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
+    b_trig_specific: TButton;
+    b_act_email_attachments: TButton;
     b_journal: TBitBtn;
     cb_trig_enable: TCheckBox;
     cb_stopatdurationend: TCheckBox;
-    cb_trig_type: TComboBox;
     dtp_start: TDateTimePicker;
     dtp_stop: TDateTimePicker;
     dtp_limit: TDateTimePicker;
+    ed_act_email_serv: TEdit;
     ed_act_com_hand: TEditButton;
-    ed_act_exec_path1: TEdit;
+    ed_act_sm_title: TEdit;
     ed_act_email_to: TEdit;
     ed_act_email_subj: TEdit;
     ed_act_email_from: TEdit;
@@ -43,6 +45,7 @@ type
     e_uri: TEdit;
     e_doc: TEdit;
     gb_repetition: TGroupBox;
+    lab_act_email_serv: TLabel;
     lab_act_email_from: TLabel;
     lab_act_email_subj: TLabel;
     lab_act_email_body: TLabel;
@@ -60,11 +63,12 @@ type
     mem_act_email_body: TMemo;
     mem_act_sm_mes: TMemo;
     mem_act_com_data: TMemo;
-    PageControl1: TPageControl;
     Panel1: TPanel;
+    trig_pan: TPanel;
+    pc_act: TPageControl;
     actpanel: TPanel;
-    sdt_lab2: TLabel;
-    TabSheet1: TTabSheet;
+    lab_trig_lim: TLabel;
+    ts_act_showmessage: TTabSheet;
     ts_act_exec: TTabSheet;
     ts_act_email: TTabSheet;
     ts_act_com: TTabSheet;
@@ -76,7 +80,7 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    sdt_lab: TLabel;
+    lab_trig_start: TLabel;
     lab_tr_id: TLabel;
     lb_trig: TListBox;
     lb_actions: TListBox;
@@ -84,11 +88,11 @@ type
     m_description: TMemo;
     pc: TPageControl;
     bpan: TPanel;
-    sdt_lab1: TLabel;
+    lab_trig_end: TLabel;
     SynEdit1: TSynEdit;
     SynPluginSyncroEdit1: TSynPluginSyncroEdit;
     SynXMLSyn1: TSynXMLSyn;
-    tbtrig1: TToolBar;
+    tb_act: TToolBar;
     tb_actadd: TToolButton;
     tb_actdel: TToolButton;
     ts_xml: TTabSheet;
@@ -99,22 +103,24 @@ type
     ts_trig: TTabSheet;
     ts_act: TTabSheet;
     ts_advprm: TTabSheet;
+    procedure b_act_email_attachmentsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure lb_trigClick(Sender: TObject);
+    procedure Panel1Click(Sender: TObject);
     procedure pcChanging(Sender: TObject; var AllowChange: Boolean);
-    procedure TaskDialog1ButtonClicked(Sender: TObject;
-      AModalResult: TModalResult; var ACanClose: Boolean);
+    procedure TaskDialog1ButtonClicked(Sender: TObject;        AModalResult: TModalResult; var ACanClose: Boolean);
     procedure tb_actaddClick(Sender: TObject);
     procedure tb_actdelClick(Sender: TObject);
     procedure tb_trigaddClick(Sender: TObject);
     procedure tb_trigdelClick(Sender: TObject);
+    procedure trig_panClick(Sender: TObject);
     procedure ts_actShow(Sender: TObject);
+
     procedure ts_trigShow(Sender: TObject);
     procedure ts_xmlShow(Sender: TObject);
   private
-    cur_trig:integer;
-    cur_act:integer;
+
     procedure load_act;
     procedure load_trig;
     procedure refresh_act;
@@ -135,233 +141,29 @@ var fs_ms_new:TFormatSettings;
 implementation
 
 {$R *.lfm}
- uses math,StrUtils,selectlistU
+ uses math
+    ,StrUtils
+    ,selectlistU
    ,DateUtils
-   ,activex;
+   ,activex
+   ,handle_proc;
 
-type
- pirec=^tirec;
- { tirec }
- tirec=class
- private
-   function GetasComHandleract: IComHandlerAction;
-   function GetasEmailact: IEmailAction;
-   function GetasExecact: IExecAction;
-   function GetasShowMessageact: IShowMessageAction;
-   function Getastrig:ITrigger;
-   function Getasact: IAction;
-  public
-    i:IDispatch;
-    constructor create(ii:IDispatch);
-    destructor destroy; override;
-    property asTrig:ITrigger read Getastrig;
-    property asAct:IAction read Getasact;
-    property asEmailAct:IEmailAction read GetasEmailact;
-    property asExecAct:IExecAction read GetasExecact;
-    property asShowMessageAct:IShowMessageAction read GetasShowMessageact;
-    property asComHandlerAct:IComHandlerAction read GetasComHandleract;
- end;
-
- { tirec }
-
-function tirec.GetasComHandleract: IComHandlerAction;
-begin
-       result:= i as IComHandlerAction;
-end;
-
-function tirec.GetasEmailact: IEmailAction;
-begin
- result:= i as IEmailAction;
-end;
-
-function tirec.GetasExecact: IExecAction;
-begin
- result:= i as IExecAction;
-end;
-
-function tirec.GetasShowMessageact: IShowMessageAction;
-begin
- result:= i as IShowMessageAction;
-end;
-
- function tirec.Getastrig: ITrigger;
- begin
-    result:= i as ITrigger;
- end;
-
- function tirec.Getasact: IAction;
- begin
-  result:= i as IAction;
- end;
-
-
-constructor tirec.create(ii: IDispatch);
-begin
-  i:=ii;
-end;
-
-destructor tirec.destroy;
-begin
-   i:=nil;
-end;
 
 
  { Teditform }
- const _trig_str:array[0..$b] of string=
- (
-'TASK_TRIGGER_EVENT',
-'TASK_TRIGGER_TIME',
-'TASK_TRIGGER_DAILY',
-'TASK_TRIGGER_WEEKLY',
-'TASK_TRIGGER_MONTHLY',
-'TASK_TRIGGER_MONTHLYDOW',
-'TASK_TRIGGER_IDLE',
-'TASK_TRIGGER_REGISTRATION',
-'TASK_TRIGGER_BOOT',
-'TASK_TRIGGER_LOGON',
-'',
-'TASK_TRIGGER_SESSION_STATE_CHANGE'
-
-);
-
-const _act_str:array[0..7] of string=
- (
-  'TASK_ACTION_EXEC',
-  '','','','',
-  'TASK_ACTION_COM_HANDLER',
-  'TASK_ACTION_SEND_EMAIL',
-  'TASK_ACTION_SHOW_MESSAGE'
-);
-
-
-
-  function TryISOStrToTime1(const aString: string; Out outTime: TDateTime): Boolean;
-  var
-    xHour, xMinute, xSecond, xMillisecond, xLength: LongInt;
-  begin
-    Result := True;
-    xLength := Length(aString);
-    if (xLength>0) and (aString[xLength] = 'Z') then
-    begin
-      Dec(xLength);
-    end else
-    if (xLength>6) and CharInSet(aString[xLength-5], ['+', '-']) then
-    begin
-      Result :=
-        TryStrToInt(Copy(aString, xLength-4, 2), xHour) and
-        (aString[xLength-2] = ':') and
-        TryStrToInt(Copy(aString, xLength-1, 2), xMinute);
-      Dec(xLength, 6);
-    end else
-    if (xLength>5) and CharInSet(aString[xLength-4], ['+', '-']) then
-    begin
-      Result :=
-        TryStrToInt(Copy(aString, xLength-3, 2), xHour) and
-        TryStrToInt(Copy(aString, xLength-1, 2), xMinute);
-      Dec(xLength, 5);
-    end else
-    if (xLength>3) and CharInSet(aString[xLength-2], ['+', '-']) then
-    begin
-      Result :=
-        TryStrToInt(Copy(aString, xLength-1, 2), xHour);
-      Dec(xLength, 3);
-    end;
-    if not Result then
-    begin
-      outTime := 0;
-      Exit;
-    end;
-
-    case xLength of
-      2: Result :=
-            TryStrToInt(aString, xHour) and
-            TryEncodeTime(xHour, 0, 0, 0, outTime);
-      4: Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            TryStrToInt(Copy(aString, 3, 2), xMinute) and
-            TryEncodeTime(xHour, xMinute, 0, 0, outTime);
-      5: Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            (aString[3] = ':') and
-            TryStrToInt(Copy(aString, 4, 2), xMinute) and
-            TryEncodeTime(xHour, xMinute, 0, 0, outTime);
-      6: Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            TryStrToInt(Copy(aString, 3, 2), xMinute) and
-            TryStrToInt(Copy(aString, 5, 2), xSecond) and
-            TryEncodeTime(xHour, xMinute, xSecond, 0, outTime);
-      8: Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            (aString[3] = ':') and
-            TryStrToInt(Copy(aString, 4, 2), xMinute) and
-            (aString[6] = ':') and
-            TryStrToInt(Copy(aString, 7, 2), xSecond) and
-            TryEncodeTime(xHour, xMinute, xSecond, 0, outTime);
-      10: Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            TryStrToInt(Copy(aString, 3, 2), xMinute) and
-            TryStrToInt(Copy(aString, 5, 2), xSecond) and
-            (aString[7] = '.') and
-            TryStrToInt(Copy(aString, 8, 3), xMillisecond) and
-            TryEncodeTime(xHour, xMinute, xSecond, xMillisecond, outTime);
-
-    else
-      if  xLength>=12 then
-            Result :=
-            TryStrToInt(Copy(aString, 1, 2), xHour) and
-            (aString[3] = ':') and
-            TryStrToInt(Copy(aString, 4, 2), xMinute) and
-            (aString[6] = ':') and
-            TryStrToInt(Copy(aString, 7, 2), xSecond) and
-            (aString[9] = '.') and
-            TryStrToInt(Copy(aString, 10, 3), xMillisecond) and
-            TryEncodeTime(xHour, xMinute, xSecond, xMillisecond, outTime)
-      else   Result := False;
-    end;
-
-    if not Result then
-      outTime := 0;
-  end;
-
-
-  function TryISOStrToDateTime1(const aString: string; out outDateTime: TDateTime): Boolean;
-  var
-    xLength: Integer;
-    sDate,sTime : String;
-    xDate, xTime: TDateTime;
-
-  begin
-    xLength := Length(aString);
-    if (xLength>11) and CharInSet(aString[11], [' ', 'T']) then
-      begin
-      sDate:=Copy(aString, 1, 10);
-      sTime:=Copy(aString, 12, Length(aString))
-      end
-    else if (xLength>9) and CharInSet(aString[9], [' ', 'T']) then
-      begin
-      sDate:=Copy(aString, 1, 8);
-      sTime:=Copy(aString, 10, Length(aString));
-      end
-    else
-      exit(False);
-    Result:=TryISOStrToDate(sDate, xDate) and TryISOStrToTime1(sTime, xTime);
-    if Result then
-      outDateTime := xDate+xTime
-    else
-      outDateTime := 0;
-  end;
-
-
 
 procedure Teditform.refresh_triggers;
-var i:integer;
+var i,c:integer;
+     s:string;
 begin
  for i:=0 to  lb_trig.count-1 do tirec(lb_trig.Items.Objects[i]).Free;
  lb_trig.clear;
- for i:=1 to def.Triggers.Count do
+ c:=def.Triggers.Count;
+ for i:=1 to c do
  begin
-   lb_trig.AddItem( def.Triggers[i].Id+' ['+_trig_str[def.Triggers[i].Type_]+'] '
-    +IfThen(def.Triggers[i].Enabled,'(on)','(off)'), tirec.create(def.Triggers[i]) );
+   s:= def.Triggers[i].Id+' ['+_trig_str[def.Triggers[i].Type_]+'] ';
+   s:=s+IfThen(def.Triggers[i].Enabled,'(on)','(off)');
+   lb_trig.AddItem(s, tirec.create(def.Triggers[i]) );
  end;
 
 end;
@@ -388,10 +190,6 @@ begin
  //fs_ms_new.DateSeparator:='-';
  //fs_ms_new.TimeSeparator:=':';
 
- for i:=0 to high(_trig_str) do
- if _trig_str[i]<>'' then
-   cb_trig_type.AddItem(_trig_str[i],tobject(i));
-
 
  caption:='Задание: '+Path;
   // main
@@ -407,9 +205,62 @@ begin
  refresh_triggers;
  // actions
  refresh_act;
+ lb_actions.Tag:=-1;
+ lb_trig.Tag:=-1;
+ //lb_trig.ItemIndex:=ifthen(lb_trig.Count=0,-1,0);
+ //load_trig;
 
- lb_trig.ItemIndex:=ifthen(lb_trig.Count=0,-1,0);
- load_trig;
+
+end;
+
+
+
+procedure Teditform.lb_trigClick(Sender: TObject);
+begin
+  if TListBox(sender).ItemIndex=-1 then
+     exit
+  else
+  begin
+    if TListBox(sender).ItemIndex<>TListBox(sender).Tag then
+    begin
+      if TListBox(sender).Tag<>-1 then
+      begin
+        if sender=lb_trig then save_trig
+        else if Sender=lb_actions then save_act;
+      end;
+      if sender=lb_trig then load_trig
+      else if Sender=lb_actions then load_act;
+      TListBox(sender).Tag:=TListBox(sender).ItemIndex;
+    end;
+  end;
+end;
+
+procedure Teditform.Panel1Click(Sender: TObject);
+begin
+
+end;
+
+
+procedure Teditform.ts_actShow(Sender: TObject);
+begin
+  if (lb_actions.ItemIndex=-1) and (lb_actions.Count>0) then
+  begin
+    lb_actions.ItemIndex:=0;
+    load_act;
+  end;
+
+end;
+
+
+
+
+procedure Teditform.ts_trigShow(Sender: TObject);
+begin
+  if (lb_trig.ItemIndex=-1) and (lb_trig.Count>0) then
+  begin
+    lb_trig.ItemIndex:=0;
+    load_trig;
+  end;
 end;
 
 procedure Teditform.save_trig;
@@ -417,7 +268,8 @@ var t:tdatetime;
     tr:ITrigger;
     s:string;
 begin
-  tr:=tirec(lb_trig.Items.Objects[cur_trig]).asTrig;
+  if lb_trig.Tag<0 then exit;
+  tr:=tirec(lb_trig.Items.Objects[lb_trig.Tag]).asTrig;
   // tr.Id:=lab_tr_id.Caption;
   tr.Enabled:=cb_trig_enable.Checked;
   //tr.Type_:=longword(cb_trig_type.Items.Objects[cb_trig_type.ItemIndex]);
@@ -443,7 +295,8 @@ var t:tdatetime;
     s:string;
       Data : OleVariant;
 begin
-  aa:=tirec(lb_actions.Items.Objects[cur_trig]);
+  if lb_actions.Tag<0 then exit;
+  aa:=tirec(lb_actions.Items.Objects[lb_actions.Tag]);
 //  aa.asAct.Id:=lab_act_id.Caption;
   case aa.asAct.Type_ of
     TASK_ACTION_EXEC:
@@ -461,7 +314,7 @@ begin
       begin
         aa.asEmailAct.From:=ed_act_email_from.Text;
         aa.asEmailAct.ReplyTo:=ed_act_email_to.Text;
-        aa.asEmailAct.Server:='';
+        aa.asEmailAct.Server:=ed_act_email_serv.text;
         aa.asEmailAct.Subject:=ed_act_email_subj.Text;
         aa.asEmailAct.To_:=ed_act_email_to.Text;
         aa.asEmailAct.Cc:='';
@@ -490,9 +343,9 @@ var t:tdatetime;
     s:string;
     i:integer;
 begin
- i:=lb_actions.ItemIndex;
- if i<0 then exit;
- aa:=tirec(lb_actions.Items.Objects[i]);
+ if lb_actions.ItemIndex<0 then exit;
+ aa:=tirec(lb_actions.Items.Objects[lb_actions.ItemIndex]);
+
  lab_act_id.Caption:= aa.asAct.Id+' ['+_act_str[aa.asAct.Type_]+']';
  case aa.asAct.Type_ of
    TASK_ACTION_EXEC:
@@ -500,18 +353,39 @@ begin
         ed_act_exec_path.Text:=aa.asExecAct.Path;
         ed_act_exec_arg.text:=aa.asExecAct.Arguments;
         ed_act_exec_wd.text:=aa.asExecAct.WorkingDirectory;
+        pc_act.ActivePage:=ts_act_exec;
      end;
    TASK_ACTION_COM_HANDLER:
      begin
-
+       ed_act_com_hand.Text:=aa.asComHandlerAct.ClassId;
+       mem_act_com_data.Text:=aa.asComHandlerAct.Data;
+       pc_act.ActivePage:=ts_act_com;
      end;
    TASK_ACTION_SEND_EMAIL:
      begin
+       ed_act_email_from.Text:=aa.asEmailAct.From;
+       ed_act_email_to.Text:=aa.asEmailAct.ReplyTo;
+       ed_act_email_serv.text:=aa.asEmailAct.Server;
+       ed_act_email_subj.Text:=aa.asEmailAct.Subject;
+       ed_act_email_to.Text:=aa.asEmailAct.To_;
+       //aa.asEmailAct.Cc:='';
+       //aa.asEmailAct.Bcc:='';
+       mem_act_email_body.Text:=aa.asEmailAct.Body;
 
+//        aa.asEmailAct.HeaderFields.Item[1].Name:='';
+//        aa.asEmailAct.HeaderFields.Item[1].Value:='';
+
+       //      aa.asEmailAct.Attachments:=SafeArrayCreateVector(varvariant,1,1);
+   //    data:='';
+//        if SafeArrayPutElement(aa.asEmailAct.Attachments, 1, Data) <> S_OK  then  raise Exception.Create('Error SafeArrayPutElement');
+
+       pc_act.ActivePage:=ts_act_email;
      end;
    TASK_ACTION_SHOW_MESSAGE:
      begin
-
+       ed_act_sm_title.Text:=aa.asShowMessageAct.Title;
+       mem_act_sm_mes.Text:=aa.asShowMessageAct.MessageBody;
+       pc_act.ActivePage:=ts_act_showmessage;
      end;
  end;
 
@@ -523,49 +397,45 @@ end;
 
 procedure Teditform.load_trig;
 var t:tdatetime;
-    tr:ITrigger;
+     aa:tirec;
     s:string;
     i:integer;
 begin
- i:=lb_trig.ItemIndex;
- if i<0 then exit;
- tr:=tirec(lb_trig.Items.Objects[i]).asTrig;
- lab_tr_id.Caption:= tr.Id;
- cb_trig_type.ItemIndex:=cb_trig_type.Items.IndexOfObject(tobject(tr.Type_));
- cb_trig_enable.Checked:= tr.Enabled;
 
-  if TryISOStrToDateTime1(tr.StartBoundary,t) then dtp_start.DateTime:=t else dtp_start.DateTime:=nan;
-  if TryISOStrToDateTime1(tr.EndBoundary,t) then dtp_stop.DateTime:=t else dtp_stop.DateTime:=nan;
-  if TryISOStrToDateTime1(tr.ExecutionTimeLimit,t) then dtp_limit.DateTime:=t else dtp_limit.DateTime:=nan;
+ if lb_trig.ItemIndex<0 then exit;
+ aa:=tirec(lb_trig.Items.Objects[lb_trig.ItemIndex]);
+ i:=aa.asTrig.Type_;
+ lab_tr_id.Caption:= aa.asTrig.Id+' ['+_trig_str[i]+']'; ;
+ case i of
+   TASK_TRIGGER_EVENT:;
+   TASK_TRIGGER_TIME:;
+   TASK_TRIGGER_DAILY:;
+   TASK_TRIGGER_WEEKLY:;
+   TASK_TRIGGER_MONTHLY:;
+   TASK_TRIGGER_MONTHLYDOW:;
+   TASK_TRIGGER_IDLE:;
+   TASK_TRIGGER_REGISTRATION:;
+   TASK_TRIGGER_BOOT:;
+   TASK_TRIGGER_LOGON:;
+   TASK_TRIGGER_SESSION_STATE_CHANGE:;
+ end;
+
+ cb_trig_enable.Checked:= aa.asTrig.Enabled;
+
+  if TryISOStrToDateTime1(aa.asTrig.StartBoundary,t) then dtp_start.DateTime:=t else dtp_start.DateTime:=nan;
+  if TryISOStrToDateTime1(aa.asTrig.EndBoundary,t) then dtp_stop.DateTime:=t else dtp_stop.DateTime:=nan;
+  if TryISOStrToDateTime1(aa.asTrig.ExecutionTimeLimit,t) then dtp_limit.DateTime:=t else dtp_limit.DateTime:=nan;
 
 
-  ed_dur.text:= tr.Repetition.Duration;
-  ed_interval.text:=tr.Repetition.Interval;
-  cb_stopatdurationend.Checked:= tr.Repetition.StopAtDurationEnd;
+  ed_dur.text:= aa.asTrig.Repetition.Duration;
+  ed_interval.text:=aa.asTrig.Repetition.Interval;
+  cb_stopatdurationend.Checked:= aa.asTrig.Repetition.StopAtDurationEnd;
 
-
-
-
-
- memo1.Clear;
- memo1.Lines.Add( 'TIME LIMIT;'+tr.ExecutionTimeLimit);
- memo1.Lines.Add('DUR:'+ tr.Repetition.Duration);
- memo1.Lines.Add( 'INTERVAL:'+tr.Repetition.Interval);
 
 
 end;
 
-procedure Teditform.lb_trigClick(Sender: TObject);
-begin
-  if lb_trig.ItemIndex=-1 then  exit else
-  begin
-    if lb_trig.ItemIndex<>cur_trig then
-    begin
-      if cur_trig<>-1 then save_trig;
-      load_trig;
-    end;
-  end;
-end;
+
 
 procedure Teditform.pcChanging(Sender: TObject; var AllowChange: Boolean);
 begin
@@ -592,17 +462,18 @@ begin
  begin
      aa:= def.Actions.Create(strtoint(querylist.ListBox1.Items.ValueFromIndex[querylist.ListBox1.ItemIndex]));
      refresh_act;
-     cur_act:=0;
+     lb_actions.tag:=0;
      for i:=0 to lb_actions.Count-1 do
      begin
        if tirec(lb_actions.Items.Objects[i]).asAct=aa then
        begin
-         cur_act:=i;
+         lb_actions.tag:=i;
          break;
        end;
      end;
  end;
  load_act;
+
 
 end;
 
@@ -612,7 +483,8 @@ begin
  begin
    def.Actions.Remove(lb_actions.ItemIndex+1);
    refresh_act;
-   cur_act:=0; load_act;
+   lb_actions.tag:=0;
+   load_act;
  end;
 end;
 
@@ -628,12 +500,12 @@ begin
  begin
      tr:= def.Triggers.Create(strtoint(querylist.ListBox1.Items.ValueFromIndex[querylist.ListBox1.ItemIndex]));
      refresh_triggers;
-     cur_trig:=0;
+     lb_trig.Tag:=0;
      for i:=0 to lb_trig.Count-1 do
      begin
        if tirec(lb_trig.Items.Objects[i]).asTrig=tr then
        begin
-         cur_trig:=i;
+         lb_trig.Tag:=i;
          break;
        end;
      end;
@@ -648,28 +520,16 @@ begin
   begin
     def.Triggers.Remove(lb_trig.ItemIndex+1);
     refresh_triggers;
-    cur_trig:=0; load_trig;
-  end;
-end;
-
-procedure Teditform.ts_actShow(Sender: TObject);
-begin
-  if (lb_actions.ItemIndex=-1) and (lb_actions.Count>0) then
-  begin
-    lb_actions.ItemIndex:=0;
-    load_act;
-  end;
-
-end;
-
-procedure Teditform.ts_trigShow(Sender: TObject);
-begin
-  if (lb_trig.ItemIndex=-1) and (lb_trig.Count>0) then
-  begin
-    lb_trig.ItemIndex:=0;
+    lb_trig.Tag:=0;
     load_trig;
   end;
 end;
+
+procedure Teditform.trig_panClick(Sender: TObject);
+begin
+
+end;
+
 
 procedure Teditform.ts_xmlShow(Sender: TObject);
 begin
@@ -693,6 +553,11 @@ begin
   end;
   for i:=0 to lb_trig.Count-1 do  tirec(lb_trig.Items.Objects[i]).i:=nil;
   for i:=0 to lb_actions.Count-1 do  tirec(lb_actions.Items.Objects[i]).i:=nil;
+end;
+
+procedure Teditform.b_act_email_attachmentsClick(Sender: TObject);
+begin
+  // todo
 end;
 
 end.
