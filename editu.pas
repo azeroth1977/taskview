@@ -121,10 +121,11 @@ type
     procedure ts_xmlShow(Sender: TObject);
   private
 
-    procedure load_act;
-    procedure load_trig;
     procedure refresh_act;
     procedure refresh_triggers;
+
+    procedure load_act;
+    procedure load_trig;
     procedure save_act;
     procedure save_trig;
 
@@ -158,12 +159,13 @@ var i,c:integer;
 begin
  for i:=0 to  lb_trig.count-1 do tirec(lb_trig.Items.Objects[i]).Free;
  lb_trig.clear;
+ showmessage(inttostrlb_trig.count)
  c:=def.Triggers.Count;
  for i:=1 to c do
  begin
    s:= def.Triggers[i].Id+' ['+_trig_str[def.Triggers[i].Type_]+'] ';
    s:=s+IfThen(def.Triggers[i].Enabled,'(on)','(off)');
-   lb_trig.AddItem(s, tirec.create(def.Triggers[i]) );
+   lb_trig.Items.AddObject(s,tirec.create(def.Triggers[i]));
  end;
 
 end;
@@ -183,24 +185,17 @@ end;
 procedure Teditform.FormShow(Sender: TObject);
 var i:integer;
 begin
- //fs_ms_new:=DefaultFormatSettings;
- //fs_ms_new.ShortDateFormat:='yyyy-mm-dd"T"';
- //fs_ms_new.ShortTimeFormat:='hh:nn:ss"."zzz';
-
- //fs_ms_new.DateSeparator:='-';
- //fs_ms_new.TimeSeparator:=':';
-
-
  caption:='Задание: '+Path;
-  // main
+ // main
+
  e_version.Text:=def.RegistrationInfo.Version;
  e_uri.text:=def.RegistrationInfo.URI;
  e_source.text:=def.RegistrationInfo.Source;
  e_doc.text:=def.RegistrationInfo.Documentation;
- // if def.RegistrationInfo.Date='' then e_date.Datetime=nan;
  e_date.DateTime:=StrToDateTimeDef(def.RegistrationInfo.Date,nan);
  e_author.Text:=  def.RegistrationInfo.Author;
  m_description.Lines.text:=Def.RegistrationInfo.Description;
+
  // triggers
  refresh_triggers;
  // actions
@@ -398,7 +393,7 @@ end;
 procedure Teditform.load_trig;
 var t:tdatetime;
      aa:tirec;
-    s:string;
+    //s:string;
     i:integer;
 begin
 
@@ -439,8 +434,8 @@ end;
 
 procedure Teditform.pcChanging(Sender: TObject; var AllowChange: Boolean);
 begin
-   if pc.ActivePage=ts_trig then save_trig
-//   else if pc.ActivePage=ts_act then save_act;
+   if (pc.ActivePage=ts_trig) and (lb_trig.Count>0) then save_trig;
+//   else (if pc.ActivePage=ts_act)  and (lb_trig.Count>0) then save_act;
 
 end;
 
@@ -551,8 +546,8 @@ begin
 
     Def.RegistrationInfo.Description:=m_description.Lines.Text;
   end;
-  for i:=0 to lb_trig.Count-1 do  tirec(lb_trig.Items.Objects[i]).i:=nil;
-  for i:=0 to lb_actions.Count-1 do  tirec(lb_actions.Items.Objects[i]).i:=nil;
+  for i:=0 to lb_trig.Count-1 do  tirec(lb_trig.Items.Objects[i]).clear;
+  for i:=0 to lb_actions.Count-1 do  tirec(lb_actions.Items.Objects[i]).clear;
 end;
 
 procedure Teditform.b_act_email_attachmentsClick(Sender: TObject);

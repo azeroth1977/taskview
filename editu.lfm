@@ -14,9 +14,9 @@ object editform: Teditform
     Height = 526
     Top = 0
     Width = 1008
-    ActivePage = ts_prm
+    ActivePage = ts_trig
     Align = alClient
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     OnChanging = pcChanging
     object ts_prm: TTabSheet

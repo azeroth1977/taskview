@@ -13,6 +13,7 @@ type
   { tirec }
   tirec=class
   private
+    i:IDispatch;
     function GetasBootTrigger: IBootTrigger;
     function GetasComHandleract: IComHandlerAction;
     function GetasDailyTrigger: IDailyTrigger;
@@ -24,9 +25,9 @@ type
     function Getastrig:ITrigger;
     function Getasact: IAction;
    public
-     i:IDispatch;
      constructor create(ii:IDispatch);
      destructor destroy; override;
+     procedure clear;
      property asTrig:ITrigger read Getastrig;
      property asAct:IAction read Getasact;
      // triggers
@@ -285,6 +286,11 @@ end;
 destructor tirec.destroy;
 begin
    i:=nil;
+end;
+
+procedure tirec.clear;
+begin
+  i:=nil;
 end;
 
 

@@ -5,9 +5,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-   VirtualTrees
-  ,ActiveX
-  ,TaskScheduler_1_0_TLB;
+   VirtualTrees  ,TaskScheduler_1_0_TLB;
 
 type
 
@@ -63,6 +61,7 @@ var ef:Teditform;
   d:ptir;
   t:IRegisteredTask;
   f:ITaskFolder;
+  r:tmodalresult;
 begin
 
   if (vst.FocusedNode<>nil) and (vst.FocusedNode^.Dummy=0) then
@@ -71,13 +70,16 @@ begin
     t:=(d.i as IRegisteredTask);
     d:=vst.GetNodeData(vst.FocusedNode.Parent);
     f:=(d.i as ITaskFolder);
-    ef:=Teditform.Create(self);
+
+   ef:=Teditform.Create(self);
+
     try
       ef.ts:=ts;
       ef.path:=t.Path;
       ef.def:=ts.NewTask(0);
       ef.def.XmlText:=t.Definition.XmlText;
-      if ef.showmodal=mrok then
+      r:= ef.showmodal;
+      if r=mrok then
       begin
         d:=vst.GetNodeData(vst.FocusedNode);
         d.i:=f.RegisterTaskDefinition(t.Path,ef.def,TASK_UPDATE,'','',TASK_LOGON_INTERACTIVE_TOKEN,'');
@@ -88,6 +90,7 @@ begin
     finally
      ef.Free;
     end;
+
   end;
 
 end;
